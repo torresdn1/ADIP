@@ -1,0 +1,314 @@
+---
+title: "Ejercicio de evaluación"
+subtitle: "Ejercicio de evaluación: ADIP"
+author: "Donovan Torres"
+date: "Septiembre, 2021"
+output:
+  xaringan::moon_reader:
+    css: ["default", "kunoichi", "rladies", "rladies-fonts"]
+    lib_dir: libs
+    seal: false
+    self_contained: true
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      beforeInit: "macros.js"
+---
+background-image: url(https://wallpapers.com/images/high/akatsuki-naruto-shippuden-sharingan-uchiha-itachi-wallpaper-veg60pbkvhdwrn7r.jpg)
+background-size: cover
+class: middle, inverse
+
+```{r setup, include = FALSE}
+library(knitr)
+library(tidyverse)
+library(xaringanExtra)
+library(icons)
+library(leaflet)
+library(sf)
+
+opts_chunk$set(echo=FALSE, collapse = TRUE, dpi = 300)
+xaringanExtra::use_tile_view()
+xaringanExtra::use_clipboard()
+xaringanExtra::use_share_again()
+```
+
+.pull-left[
+<img style="border-radius: 50%;" src="https://i.pinimg.com/originals/52/94/b0/5294b0124ee4eb59e881ceac91d65101.jpg" width="150px"/>
+
+##Donovan Torres 
+#### Politólogo Internacionalista
+
+.fade[Centro de Investigación y Docencia Económicas
+
+donovan.torres.2497@gmail.com
+
+]
+
+[`r icons::fontawesome("twitter")`](https://twitter.com/torres_dn1) 
+[`r icons::fontawesome("github")`](https://github.com/torresdn1)
+
+]
+
+<div style="text-align: right">
+.pull-right[
+
+## **`r rmarkdown::metadata$subtitle`**
+### `r rmarkdown::metadata$date`
+]
+
+.left[.footnote[
+---- 
+*Datos y su manejo pueden ser consultados [**aquí**](https://github.com/torresdn1). Presiona "O" para Overview de la presentación y "H" para Help*]]
+<div/>
+---
+class: center, middle
+
+# Ejercicio Práctico
+
+----
+### ¿Cuál es el efecto de las cámaras del C5 en la incidencia delictiva de la CDMX?
+
+### 1.- Estadística descriptiva
+
+### 2.- Modelo Inferencial
+
+### 3.- Visualizaciones
+
+---
+# Videovigilancia e Incidencia Delictiva en la CDMX
+-----
+- Como parte de la estrategia de seguridad del Gobierno de la CDMX, el Centro de Comando, Control, Cómputo, Comunicaciones y Contacto Ciudadano (C5) opera y monitorea más de 15 mil cámaras de vigilancia que conforman el Sistema Tecnológico de Videovigilancia (STV). Su principal propósito es prevenir y alertar inmediatamente a las autoridades de seguridad y de emergencias capitalinas sobre cualquier situación de riesgo.
+
+### Objetivo del ejercicio: 
+
+.pull-left[
+- El presente trabajo tiene como propósito estudiar el efecto de las cámaras del C5 en la incidencia delictiva de la CDMX. 
+
+- Dicho análisis fue realizado a **nivel colonia** y para ello, fueron utilizados dos conjuntos de datos principales: la **ubicación de los postes del C5** habilitados con internet gratuito y el número de **Carpetas de Investigación** abiertas por la Fiscalía General de Justicia (FGJ) de la Ciudad de México a partir de enero de 2016.
+]
+
+.pull-right[
+- El primer conjunto de datos es la fuente de información disponible que contiene la georeferencia de la mayor parte de las camáras del STV (poco más de 13 mil cámaras).<sup>1</sup>
+
+- El segundo, por su parte, contiene las investigaciones previas iniciadas por el Ministerio Público, sobre los hechos denunciados por la probable participación de un inculpado en un hecho delictivo.
+]
+
+[1] El listado con la ubicación de los postes del C5 habilitados con internet gratuito puede ser consultado [aquí](https://datos.cdmx.gob.mx/dataset/ubicacion-acceso-gratuito-internet-wifi-c5)
+
+---
+# Comentarios preliminares
+-----
+
+La **Incidencia Delictiva** fue definida como el número de eventos delictivos reportados durante un periodo de tiempo específico y la **Tasa de incidencia delictiva** *(I)* del año *i* como el cociente entre el número de delitos reportados *(C)* <sup>2</sup> y la población de 15 años o más *(N)* <sup>3</sup> por cada 100 mil de esos habitantes.
+
+$$ I_i= 100000 · \frac{C_i}{N_i} $$ 
+
+Por último, la **delimitación territorial de las colonias de la Ciudad de México** fue obtenida del Portal de Datos Abiertos del Gobierno de la CDMX. <sup>4</sup>
+
+- Para vincularla con las georeferencias de las cámaras de videovigilancia y de las carpetas de investigación abiertas, fueron creados diversos algoritmos que identifican la presencia de una coordenada dentro de alguna de las colonias. De esa manera, se asoció cada dato con un polígono en específico, aun cuando los conjuntos de datos no compartieran algún identificador estandarizado en común. 
+
+
+.footnote[
+[2] Las carpetas de investigación abiertas por la FGJ, están disponibles [aquí](https://datos.cdmx.gob.mx/dataset/carpetas-de-investigacion-fgj-de-la-ciudad-de-mexico)
+
+[3] Para el número de personas mayores de 15 años se utilizaron las proyecciones del Consejo Nacional de Población, disponibles [aquí](https://datos.gob.mx/busca/dataset/proyecciones-de-la-poblacion-de-mexico-y-de-las-entidades-federativas-2016-2050/resource/bf9ebdf2-8033-463c-9161-191dd210fa48)
+
+[4] El conjunto de datos descargable en formato [shapefile](https://datos.cdmx.gob.mx/dataset/coloniascdmx)
+]
+
+---
+# Vista panorámica del delito en la CDMX
+-----
+
+- La Incidencia Delictiva es uno de los problemas más salientes para la población de nuestro país. Ejemplo de ello es que en 2019, según la [Encuesta Nacional de Calidad e Impacto Gubernamental](https://www.inegi.org.mx/contenidos/programas/encig/2019/doc/09_ciudad_de_mexico.pdf) el **80%** de la población mayor de edad de la Ciudad de México refirió que la **inseguridad y la delincuencia es el problema más importante** que aqueja a su entidad federativa, seguido de la **corrupción** y el **desempleo**. 
+
+- Por esta razón, el **uso de evidencia y de soluciones tecnológicas** son fundamentales para el diseño y evaluación de la política pública en materia de seguridad y justicia.
+
+
+### ¿Está disminuyendo la incidencia delictiva?
+
+- La Visualización 1 de la siguiente diapositiva muestra la **Evolución mensual** de la Incidencia Delictiva en la CDMX durante los últimos 5 años. Las series de tiempo contienen la Tasa de Incidencia mensual por cada 100 mil habitantes mayores a 15 años (con intervalos de confianza al 95%) para las 16 alcaldías de la CDMX. 
+
+- Como puede observarse, en la mayoría de las alcaldías el delito tiene niveles más bajos que en 2018. Después de corregir la estacionalidad de los datos, es posible advertir un patrón de **disminución en los niveles de delito** reportados por la FGJ.
+
+-  Por su parte, la Visualización 2 contiene el número de delitos reportados en las 20 colonias más peligrosas (con mayor número de delitos al cierre del 2020) de la Ciudad de México. Como puede observarse, **en todas ellas el número de delitos de 2020 y 2021 han sido menores que en 2018**
+
+---
+class: center
+
+# Visualización 1: Incidencia delictiva mensual (2016-2020)
+-----
+<img src="https://raw.githubusercontent.com/torresdn1/ADIP/main/Graficas/Chart1.png" width="850px"/>
+
+---
+class: center
+
+# Visualización 2: Delitos en colonias más peligrosas
+-----
+<img src="https://raw.githubusercontent.com/torresdn1/ADIP/main/Graficas/Chart2.png" width="850px"/>
+
+---
+
+# El delito y el espacio geográfico
+-----
+
+Ahora bien, la **Incidencia Delictiva**, como muchos otros fenómenos sociales, posee un componente espacial de alta importancia, especialmente porque lo que sucede dentro de un colonia determinada suele estar relacionado con lo que sucede en las colonias colindantes. A propósito vale mencionar la: 
+
+.right[ ### Primera ley de la Geografía: Todas las cosas están relacionadas entre sí, pero las cosas más próximas en el espacio  tienen una relación mayor que las distantes (Waldo Tobler).
+]
+
+Con eso en mente, fue construido el **Mapa 1**, que contiene el **promedio de delitos reportados y el número promedio de cámaras de video vigilancia por colonias colindantes**. Dicho indicador fue construido de la siguiente manera:
+
+1. Para cada colonia se tomó el número de delitos que ocurrieron en 2020 y el número de cámaras de video vigilancia que hay en ella y en las colonias colindantes. 
+
+2. Después, fueron calculados los promedios de las colonias vecinas (Ejemplo: para la colonia “A” si sus vecinas son “B” y ”C” se calculó el promedio de delitos y cámaras de vigilancia en A, B y C). 
+
+3. Se consideró que dos colonias son colindantes cuando su demarcación territorial compartía al menos un borde de longitud no nula.
+
+---
+
+class: center
+
+# Mapa 1: Delitos y cámaras promedio por colonias colindantes
+-----
+<img src="https://raw.githubusercontent.com/torresdn1/ADIP/main/Graficas/Mapa1-ejemplo.png"
+width="600px"/> 
+
+[5] Por su tamaño el mapa interactivo se encuentra disponible para su descarga y ejecución local  [aquí](https://github.com/torresdn1/ADIP/tree/main/Graficas)
+
+---
+# Correlación espacial
+-----
+
+Ahora bien, existen pruebas estadísticas que permiten verificar si un fenómeno sí contiene un componente espacial significativo. En ese sentido, Upton y Fingleton (1985) definen la **autocorrelación espacial como una propiedad que los datos poseen siempre que haya una variación espacial sistemática en los valores a lo largo de un mapa, o patrones en los valores registrados de localizaciones específicas**.
+
+El Índice de Moran es el estadístico más utilizado para identificar la correlación espacial y se define con una modificación a la fórmula para calcular el coeficiente de correlación de Pearson, más una matriz de peso espacial.
+
+- El rango de definición del I de Moran es de 1 a -1: 
+  - 1 determina una correlación espacial positiva (indica agrupación en los datos).
+  - 0 significa que nuestros datos están distribuidos aleatoriamente.
+  - 1 representa una correlación espacial negativa (valores disímiles están cerca unos de otros)
+.center[<img src="https://arcruz0.github.io/libroadp/00-images/maps/sp_autocorrelation.png" width="450px"/> ]
+- Es importante destacar que el estadístico **I de Moran permite identificar correlación espacial a nivel global**, pero **no permite identificar si existen grupos a nivel local** significativos para la variable de interés.
+
+---
+# Indice de Moran
+-----
+**El I de Moran para las colonias de la CDMX y la Tasa de Incidencia delictiva de 2018 y 2020** son los siguientes: 
+
+.pull-left[
+$$ I_{2020} = 0.125    $$
+$$ p < 0.000 $$
+
+$$ std. dev = 8.9$$
+
+]
+
+.pull-right[
+$$ I_{2018} =  0.136 $$
+$$ p < 0.000 $$
+
+$$ std. dev = 9.7 $$
+]
+
+.pull-left[
+- Como lo indican los resultados, la correlación espacial de la Tasa de Incidencia delictiva en la CDMX es similar en 2018 y 2020, pero no es una correlación alta. 
+
+- Con ello podemos afirmar que globalmente la incidencia delictiva no presenta altos grados de autocorrelación espacial.
+]
+
+.pull-right[
+- Aun cuando en 2018 y en 2020 se obtuvo una autocorrelación global baja y estadísticamente significativa, ello **no implica que no existan unidades con mayores niveles de autocorrelación espacial y con significancia estadística**.
+
+- La correlación espacial puede observarse de mejor manera si utilizamos unidades de análisis locales, como se realiza a continuación.
+]
+
+---
+# Distribución espacial: Indicadores locales (LISA)
+-----
+Con lo anterior en mente, ahora identificaremos las colonias que son *focos rojos* o *puntos calientes* de incidencia delictiva *localmente*.
+
+- El método **LISA (Local Indicators of Spatial Autocorrelation)** permite identificar concentraciones de valores en puntos específicos dentro de un área, con base en la relación que comparte con sus vecinos, además de que para cada métrica calcula un nivel de significancia estadística.
+
+- La clasificación resultante se describe de la siguiente manera: 
+  - **Alto-alto (AA)**: Zonas con altas tasas de incidencia delictiva y que están rodeados por otras con altas tasas.
+  - **Alto-bajo (AB)**: Datos con una alta tasa de incidencia delictiva, pero rodeado por otros con bajas tasas.
+  - **Bajo-alto (BA)**: Áreas con bajas tasas de incidencia y rodeadas por otras con tasas altas.
+  - **Bajo-bajo (BB)**: Observaciones con bajas tasas de incidencia que están rodeadas por otras iguales.
+
+- La ventaja de este método radica en que, desde una perspectiva geográfica, cualquier análisis es más valioso cuando el nivel de atención se centra en una escala local focalizada. 
+
+- Dicho lo anterior, el **Mapa 2** muestra **los Focos Rojos** en Incidencia delictiva para 2020 y 2018. Como puede observarse, en ambos años las zonas de la ciudad son similares, lo que indica un patrón claro de los indicios delicitivos en la CDMX, aunque en **2020 surgieron focos rojos nuevos, lo que podría indicar un desplazamiento del delito** a otras zonas de la ciudad.
+
+---
+
+class: center
+
+# Mapa 2: Focos Rojos en Incidencia Delictiva
+-----
+
+.pull-left[
+## 2018
+<img src="https://raw.githubusercontent.com/torresdn1/ADIP/main/Graficas/Mapa2.png"
+width="750px"/> 
+]
+
+.pull-right[
+
+## 2020
+<img src="https://raw.githubusercontent.com/torresdn1/ADIP/main/Graficas/Mapa3.png"
+width="750px"/> 
+]
+
+.left[
+- Los focos rojos están diferenciados por la significancia estadística calculada.
+- Con estos hallazgos en mente, será propuesto un **Modelo de Regresión** para estimar la relación entre el número de las cámaras de video vigilancia, el cambio en la Tasa de Incidencia Delictiva entre 2018 y 2019 por colonia. 
+]
+
+---
+# Efecto de las cámaras del C5 en la Incidencia delictiva
+-----
+
+- El presente trabajo propone un modelo de Regresión Simple definido de la siguiente manera: 
+
+$$ Y_i= \beta_0 + \beta_1 (C_1) + \delta_1 (P_2)$$
+Donde *Y* se refiere a la diferencia en la Tasa de Incidencia Delictiva entre 2018 y 2020 **(2018 -2020)** por colonia *i*; *C* y *P* se refieren al promedio de las cámaras de videovigilencia por colonias colindantes y si la colonia fue identificada como un Foco Rojo en 2020.
+
+.pull-left[
+- La gráfica muestra los **valores predichos del modelo anteriormente descrito**, y claramente muestra que la presencia de cámaras está asociada a una diferencia mayor entre las tasas de incidencia delictiva.
+
+- Los resultados también indican que dicho efecto ha sido menor en aquellas colonias identificadas como Focos Rojos en 2020.
+]
+
+.pull-right[
+
+<img src="https://raw.githubusercontent.com/torresdn1/ADIP/main/Graficas/ValoresPredichos.png"
+width="750px"/> 
+]
+---
+# ¡Muchas gracias!
+#### Datos y su manejo pueden ser consultados [aquí](https://github.com/torresdn1).
+
+
+------
+El presente trabajo fue realizado con la información pública proporcionada por el Gobierno de la Ciudad de México, a través del Portal de Datos Abiertos de la CDMX, como parte de un proceso de selección de la Agencia Digital de Innovación Pública.
+
+Puedes consultar más información en:
+
+.footnote[Sugerencias y/o comentarios son bienvenidos.
+
+Disclaimer: Durante el procedimiento para asignar a cada polígono el número de cámaras y delitos reportados existieron dos fuentes de pérdida de información: La primera sucede, naturalmente, cuando los registros no tienen una colonia o una coordenada específica. La segunda, por el contrario, sucede porque la función no identifica ningún polígono al cual pertenece el delito. Ello puede suceder porque ciertamente existen cámaras o comisión de delitos fuera de las colonias definidas por el shape, pero también porque los puntos están exactamente en medio de dos polígonos. Para tratar de corregir dicha situación y minimizar la pérdida de información, fueron utilizados puntos en común para todos los registros que formaban parte de la misma colonia. De ahi la relevancia de analizar y contemplar los promedios entre colonias vecinas. 
+]
+
+<div style="text-align: center">
+<a href="https://datos.cdmx.gob.mx/">
+<img src="https://datos.cdmx.gob.mx/uploads/admin/2020-12-29-022442.796953logo.svg" width="400px"/> <a href="https://adip.cdmx.gob.mx/"> <img src="https://adip.cdmx.gob.mx/themes/base/assets/images/logos/Logo_Dependencia.png" width="500px"/>
+
+<div/>
+
+
+
+
+
