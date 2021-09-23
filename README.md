@@ -5,4 +5,5 @@
 
 ![Chart1](https://user-images.githubusercontent.com/47362216/134451844-10018191-5e4e-42b8-8021-633386f2df21.png)
 
+![Mapa3](https://user-images.githubusercontent.com/47362216/134451896-0189cc3d-4de0-43fc-9d8b-5485e8d8c011.png) 
 
